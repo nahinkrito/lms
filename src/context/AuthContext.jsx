@@ -2,6 +2,22 @@ import { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext(null);
 
+// Dummy credentials for testing
+const DUMMY_CREDENTIALS = {
+  instructor: {
+    email: 'instructor@test.com',
+    password: 'instructor123',
+    name: 'John Smith',
+    role: 'instructor'
+  },
+  student: {
+    email: 'student@test.com',
+    password: 'student123',
+    name: 'Jane Doe',
+    role: 'student'
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -9,19 +25,19 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     setLoading(true);
     try {
-      // Simulate API call
-      const response = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            id: 1,
-            name: 'John Doe',
-            email: credentials.email,
-            role: credentials.role // 'instructor' or 'student'
-          });
-        }, 1000);
-      });
-      setUser(response);
-      return response;
+      // Simulate API call with dummy credentials
+      const matchedUser = Object.values(DUMMY_CREDENTIALS).find(
+        (user) => user.email === credentials.email && 
+                  user.password === credentials.password
+      );
+
+      if (!matchedUser) {
+        throw new Error('Invalid credentials');
+      }
+
+      // In real implementation, this would be handled by Supabase Auth
+      setUser(matchedUser);
+      return matchedUser;
     } catch (error) {
       throw new Error('Login failed');
     } finally {
@@ -30,6 +46,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // In real implementation, this would call Supabase Auth signOut
     setUser(null);
   };
 
